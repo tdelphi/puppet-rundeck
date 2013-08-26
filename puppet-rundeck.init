@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Init script for puppet-dashboard
+# Init script for puppet-rundeck
 #
 # chkconfig: - 85 15
 # description: Init script for puppet-rundeck

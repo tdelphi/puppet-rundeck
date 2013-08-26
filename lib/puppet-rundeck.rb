@@ -75,7 +75,7 @@ class PuppetRundeck < Sinatra::Base
       osVersion="#{xml_escape(facts["operatingsystemrelease"])}"
       tags="#{xml_escape([n.environment, tags.join(',')].join(','))}"
       username="#{xml_escape(PuppetRundeck.username)}"
-      hostname="#{xml_escape(facts["fqdn"] + ":" + PuppetRundeck.ssh_port.to_s)}"/>
+      hostname="#{xml_escape(facts["ipaddress"] + ":" + PuppetRundeck.ssh_port.to_s)}"/>
 EOH
     end
     response_xml << "</project>"
@@ -84,12 +84,12 @@ EOH
 
   require 'pp'
 
-  get '/' do
-    respond
-  end
-
   get '/tag/:tag' do
     respond(params[:tag])
+  end
+
+  get '/' do
+    respond
   end
 
 end

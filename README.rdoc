@@ -1,4 +1,4 @@
-= puppet-rundeck
+= puppet-rundeck-2013
 
 Integrates Puppet with RunDeck.
 
