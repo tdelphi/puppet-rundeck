@@ -66,7 +66,7 @@ begin
   PuppetRundeck.username = options[:username]
   PuppetRundeck.ssh_port = options[:ssh_port]
   PuppetRundeck.configure
-  PuppetRundeck.run! :host => "localhost", :port => options[:port] 
+  PuppetRundeck.run! :host => "localhost", :port => options[:port], :bind => '0.0.0.0'
 rescue OptionParser::InvalidArgument, OptionParser::InvalidOption, OptionParser::MissingArgument
   puts $!.to_s
   puts optparse
