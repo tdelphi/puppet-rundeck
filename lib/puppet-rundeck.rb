@@ -42,7 +42,7 @@ class PuppetRundeck < Sinatra::Base
     return input.to_s.to_xs
   end
 
-  def respond(required_tag=nil)
+  def respond(required_tag=nil,uname=nil)
     response['Content-Type'] = 'text/xml'
     response_xml = %Q(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE project PUBLIC "-//DTO Labs Inc.//DTD Resources Document 1.0//EN" "project.dtd">\n<project>\n)
       # Fix for 2.6 to 2.7 indirection difference
@@ -65,6 +65,12 @@ class PuppetRundeck < Sinatra::Base
         end
         facts = n.parameters
         os_family = facts["kernel"] =~ /windows/i ? 'windows' : 'unix'
+
+        if uname == nil
+          targetusername = PuppetRundeck.username
+        else
+          targetusername = uname
+        end
       response_xml << <<-EOH
 <node name="#{xml_escape(n.name)}"
       type="Node"
@@ -74,7 +80,7 @@ class PuppetRundeck < Sinatra::Base
       osName="#{xml_escape(facts["operatingsystem"])}"
       osVersion="#{xml_escape(facts["operatingsystemrelease"])}"
       tags="#{xml_escape([n.environment, tags.join(',')].join(','))}"
-      username="#{xml_escape(PuppetRundeck.username)}"
+      username="#{xml_escape(targetusername)}"
       hostname="#{xml_escape(facts["ipaddress"] + ":" + PuppetRundeck.ssh_port.to_s)}"/>
 EOH
     end
@@ -85,11 +91,11 @@ EOH
   require 'pp'
 
   get '/tag/:tag' do
-    respond(params[:tag])
+    respond(params[:tag], params["user"])
   end
 
   get '/' do
-    respond
+    respond (nil, params["user"])
   end
 
 end
