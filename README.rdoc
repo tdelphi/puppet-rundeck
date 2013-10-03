@@ -54,15 +54,27 @@ To use with RunDeck specify the target URL as the value of the `project.resource
 
    project.resources.url = http://localhost:8144
 
-Yo can also specify a required tag to filter the node list, to provide different project URLs based
+You can also specify a required tag to filter the node list, to provide different project URLs based
 on the same puppet server and puppet-rundeck instance:
 
    project.resources.url = http://localhost:8144/tag/production
 
+In the version puppet-rundeck-2013 you can also pass configuration flags for puppet-rundeck.
+
+- user=rundeck_ssh_username - to override SSH user for Rundeck
+- use_tags=0 - to avoid adding default tags puppet from puppetmaster
+- add_facts=fact1,fact2,fact3 - list of facter facts that will be added as tags for rundeck
+
+Examples:
+
+Add facts *fqdn* and *ipaddress* to list of tags, set SSH user to *root* and disable puppet-generated tags:
+curl http://127.0.0.1:8144/?add_facts=fqdn,ipaddress&user=root&use_tags=0
+
+
 You can specify some configuration options:
 
 * -c or --config to override the default Puppet configuration file (defaults to `/etc/puppet/puppet.conf`)
-* -u or --username the user for RunDeck to SSH as, defaults to current user
+* -u or --username the user for RunDeck to SSH as, defaults to current user (you can override this value via URL, using *user* parameter)
 * -p or --port the port to start `puppet-rundeck` on, default to 8144
 
 == Credits
@@ -71,4 +83,4 @@ Original concept heavily stolen from Adam Jacob's chef-rundeck gem
 
 == Copyright
 
-Copyright (c) 2011 James Turnbull. See LICENSE for details.
+Copyright (c) 2011 James Turnbull. Few modifications by Aleksey Timohin. See LICENSE for details.
