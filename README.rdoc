@@ -19,7 +19,9 @@ Requires:
 
 Install the gem:
 
-  $ sudo gem install puppet-rundeck
+  $ sudo gem install puppet-rundeck-2013
+  
+  [![Gem Version](https://badge.fury.io/rb/puppet-rundeck-2013.png)](http://badge.fury.io/rb/puppet-rundeck-2013)
 
 == Usage
 
