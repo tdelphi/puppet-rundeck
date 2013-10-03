@@ -42,9 +42,15 @@ class PuppetRundeck < Sinatra::Base
     return input.to_s.to_xs
   end
 
-  def respond(required_tag=nil,uname=nil)
+  def respond(required_tag=nil,uname=nil,use_tags=1)
     response['Content-Type'] = 'text/xml'
     response_xml = %Q(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE project PUBLIC "-//DTO Labs Inc.//DTD Resources Document 1.0//EN" "project.dtd">\n<project>\n)
+
+      if use_tags.nil?
+        use_tags = '1'
+      end
+      should_use_tags = (! required_tag.nil?) || (use_tags == '1')
+
       # Fix for 2.6 to 2.7 indirection difference
       Puppet[:clientyamldir] = Puppet[:yamldir]
       if Puppet::Node.respond_to? :terminus_class
@@ -54,15 +60,22 @@ class PuppetRundeck < Sinatra::Base
         Puppet::Node.indirection.terminus_class = :yaml
         nodes = Puppet::Node.indirection.search("*")
       end
+
       nodes.each do |n|
-        if Puppet::Node::Facts.respond_to? :find
-          tags = Puppet::Resource::Catalog.find(n.name).tags
+        if should_use_tags
+          if Puppet::Node::Facts.respond_to? :find
+            tags = Puppet::Resource::Catalog.find(n.name).tags
+          else
+            tags = Puppet::Resource::Catalog.indirection.find(n.name).tags
+          end
         else
-          tags = Puppet::Resource::Catalog.indirection.find(n.name).tags
+          tags = nil
         end
+
         if ! required_tag.nil?
           next if ! tags.include? required_tag
         end
+
         facts = n.parameters
         os_family = facts["kernel"] =~ /windows/i ? 'windows' : 'unix'
 
@@ -71,6 +84,13 @@ class PuppetRundeck < Sinatra::Base
         else
           targetusername = uname
         end
+
+        if tags.nil?
+          tags_string = [n.environment].join(',')
+        else
+          tags_string = [n.environment, tags.join(',')].join(',')
+        end
+
       response_xml << <<-EOH
 <node name="#{xml_escape(n.name)}"
       type="Node"
@@ -79,7 +99,7 @@ class PuppetRundeck < Sinatra::Base
       osFamily="#{xml_escape(os_family)}"
       osName="#{xml_escape(facts["operatingsystem"])}"
       osVersion="#{xml_escape(facts["operatingsystemrelease"])}"
-      tags="#{xml_escape([n.environment, tags.join(',')].join(','))}"
+      tags="#{xml_escape(tags_string)}"
       username="#{xml_escape(targetusername)}"
       hostname="#{xml_escape(facts["ipaddress"] + ":" + PuppetRundeck.ssh_port.to_s)}"/>
 EOH
@@ -91,11 +111,11 @@ EOH
   require 'pp'
 
   get '/tag/:tag' do
-    respond(params[:tag], params["user"])
+    respond(params[:tag], params["user"], params["use_tags"])
   end
 
   get '/' do
-    respond (nil, params["user"])
+    respond(nil, params["user"], params["use_tags"])
   end
 
 end
