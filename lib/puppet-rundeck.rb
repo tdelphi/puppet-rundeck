@@ -42,7 +42,7 @@ class PuppetRundeck < Sinatra::Base
     return input.to_s.to_xs
   end
 
-  def respond(required_tag=nil,uname=nil,use_tags=1)
+  def respond(required_tag=nil,uname=nil,use_tags=nil,add_facts=nil)
     response['Content-Type'] = 'text/xml'
     response_xml = %Q(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE project PUBLIC "-//DTO Labs Inc.//DTD Resources Document 1.0//EN" "project.dtd">\n<project>\n)
 
@@ -79,6 +79,21 @@ class PuppetRundeck < Sinatra::Base
         facts = n.parameters
         os_family = facts["kernel"] =~ /windows/i ? 'windows' : 'unix'
 
+        facts_string = nil
+
+        if !add_facts.nil?
+          add_facts.split(/,|;| +/).each { |fact_name|
+            fact = facts[fact_name]
+            if (!fact.nil?) and (!fact.empty?)
+              if facts_string.nil?
+                facts_string = fact
+              else
+                facts_string = [facts_string, fact].join(',')
+              end
+            end
+          }
+        end
+
         if uname == nil
           targetusername = PuppetRundeck.username
         else
@@ -86,9 +101,13 @@ class PuppetRundeck < Sinatra::Base
         end
 
         if tags.nil?
-          tags_string = [n.environment].join(',')
+          tags_string = n.environment
         else
           tags_string = [n.environment, tags.join(',')].join(',')
+        end
+        
+        if !facts_string.nil?
+          tags_string = [tags_string,facts_string].join(',')
         end
 
       response_xml << <<-EOH
@@ -111,11 +130,11 @@ EOH
   require 'pp'
 
   get '/tag/:tag' do
-    respond(params[:tag], params["user"], params["use_tags"])
+    respond(params[:tag], params["user"], params["use_tags"], params["add_facts"])
   end
 
   get '/' do
-    respond(nil, params["user"], params["use_tags"])
+    respond(nil, params["user"], params["use_tags"], params["add_facts"])
   end
 
 end
