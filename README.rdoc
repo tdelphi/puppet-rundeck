@@ -1,3 +1,6 @@
+{<img src="https://badge.fury.io/rb/puppet-rundeck-2013.png" alt="Gem Version" />}[http://badge.fury.io/rb/puppet-rundeck-2013]
+
+
 = puppet-rundeck-2013
 
 Integrates Puppet with RunDeck.
@@ -17,11 +20,11 @@ Requires:
 
 == Installation
 
+
 Install the gem:
 
   $ sudo gem install puppet-rundeck-2013
   
-  [![Gem Version](https://badge.fury.io/rb/puppet-rundeck-2013.png)](http://badge.fury.io/rb/puppet-rundeck-2013)
 
 == Usage
 
