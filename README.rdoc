@@ -67,7 +67,7 @@ on the same puppet server and puppet-rundeck instance:
 In the version puppet-rundeck-2013 you can also pass configuration flags for puppet-rundeck.
 
 - user=rundeck_ssh_username - to override SSH user for Rundeck
-- use_tags=0 - to avoid adding default tags puppet from puppetmaster
+- use_tags=0 - to avoid adding default tags puppet from puppetmaster. Disabling tags drastically speeds up result generation.
 - add_facts=fact1,fact2,fact3 - list of facter facts that will be added as tags for rundeck
 
 Examples:
