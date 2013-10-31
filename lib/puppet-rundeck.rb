@@ -110,6 +110,12 @@ class PuppetRundeck < Sinatra::Base
           tags_string = [tags_string,facts_string].join(',')
         end
 
+        if PuppetRundeck.ssh_port.to_s == '22' then
+          hostname_port = ''
+        else
+          hostname_port = "\:#{PuppetRundeck.ssh_port.to_s}"
+        end
+
       response_xml << <<-EOH
 <node name="#{xml_escape(n.name)}"
       type="Node"
@@ -120,7 +126,7 @@ class PuppetRundeck < Sinatra::Base
       osVersion="#{xml_escape(facts["operatingsystemrelease"])}"
       tags="#{xml_escape(tags_string)}"
       username="#{xml_escape(targetusername)}"
-      hostname="#{xml_escape(facts["ipaddress"] + ":" + PuppetRundeck.ssh_port.to_s)}"/>
+      hostname="#{xml_escape(facts["ipaddress"] + hostname_port)}"/>
 EOH
     end
     response_xml << "</project>"
