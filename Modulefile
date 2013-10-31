@@ -1,5 +1,5 @@
 name 'puppet-rundeck-2013'
-version '0.0.11'
+version '0.0.12'
 license 'Apache 2.0'
 summary 'Integrates Puppet with Rundeck'
 project_page 'https://github.com/tdelphi/puppet-rundeck'

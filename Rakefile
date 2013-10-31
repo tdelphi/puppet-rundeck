@@ -9,7 +9,7 @@ begin
     gem.description = %Q{Provides a resource endpoint for RunDeck from a Puppet Server}
     gem.files        = Dir["{lib,test}/**/*"] + Dir["[A-Z]*"]
     gem.require_path = "lib"
-    gem.email = "james@puppetlabs.com"
+    gem.email = "LazyDelphiBuilder@gmail.com"
     gem.homepage = "http://github.com/tdelphi/puppet-rundeck"
     gem.authors = ["James Turnbull","Aleksey Timohin"]
     gem.add_dependency "sinatra", "<= 1.3.6"

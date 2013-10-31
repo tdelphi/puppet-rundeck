@@ -42,7 +42,7 @@ class PuppetRundeck < Sinatra::Base
     return input.to_s.to_xs
   end
 
-  def respond(required_tag=nil,uname=nil,use_tags=nil,add_facts=nil)
+  def respond(required_tag=nil,required_facts=nil,uname=nil,use_tags=nil,add_facts=nil)
     response['Content-Type'] = 'text/xml'
     response_xml = %Q(<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE project PUBLIC "-//DTO Labs Inc.//DTD Resources Document 1.0//EN" "project.dtd">\n<project>\n)
 
@@ -61,6 +61,13 @@ class PuppetRundeck < Sinatra::Base
         nodes = Puppet::Node.indirection.search("*")
       end
 
+      if ! required_facts.nil?
+        # this should convert string 'fact1=fact1_value&fact2=fact2_value' to array [fact1, fact1_value, fact2, fact2_value]
+        local_required_facts = Hash[*required_facts.split(/[=&]/)].to_a
+      else
+        local_required_facts = nil
+      end
+
       nodes.each do |n|
         if should_use_tags
           if Puppet::Node::Facts.respond_to? :find
@@ -77,6 +84,11 @@ class PuppetRundeck < Sinatra::Base
         end
 
         facts = n.parameters
+
+        if ! local_required_facts.nil?
+          next if ! (local_required_facts-facts.to_a).empty?
+        end
+
         os_family = facts["kernel"] =~ /windows/i ? 'windows' : 'unix'
 
         facts_string = nil
@@ -136,11 +148,15 @@ EOH
   require 'pp'
 
   get '/tag/:tag' do
-    respond(params[:tag], params["user"], params["use_tags"], params["add_facts"])
+    respond(params[:tag], nil, params["user"], params["use_tags"], params["add_facts"])
+  end
+
+  get '/facts/:fact' do
+    respond(nil, params[:fact], params["user"], params["use_tags"], params["add_facts"])
   end
 
   get '/' do
-    respond(nil, params["user"], params["use_tags"], params["add_facts"])
+    respond(nil, nil, params["user"], params["use_tags"], params["add_facts"])
   end
 
 end
