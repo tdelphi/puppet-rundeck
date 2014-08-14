@@ -41,6 +41,11 @@ optparse = OptionParser.new do |opts|
     options[:username] = username
   end
 
+  options[:bind] = "0.0.0.0"
+  opts.on( '-b', '--bind IPADDRESS', 'The ipaddress to bind puppet-rundeck on') do |bind|
+    options[:bind] = bind
+  end
+
   options[:port] = 8144
   opts.on( '-p', '--port PORT', 'The port to run puppet-rundeck on') do |port|
     options[:port] = port
@@ -66,7 +71,7 @@ begin
   PuppetRundeck.username = options[:username]
   PuppetRundeck.ssh_port = options[:ssh_port]
   PuppetRundeck.configure
-  PuppetRundeck.run! :host => "localhost", :port => options[:port], :bind => '0.0.0.0'
+  PuppetRundeck.run! :host => "localhost", :port => options[:port], :bind => options[:port]
 rescue OptionParser::InvalidArgument, OptionParser::InvalidOption, OptionParser::MissingArgument
   puts $!.to_s
   puts optparse
